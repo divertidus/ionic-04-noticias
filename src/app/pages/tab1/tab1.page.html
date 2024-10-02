@@ -13,36 +13,12 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-grid fixed>
-    <ion-row>
-      <ion-col *ngFor="let articulo of arrayArticulos; let i = index">
-
-        <ion-card>
-          <ion-card-header>
-
-            <!-- Solo intentará mostrar la imagen si existe gracias al *ngIf -->
-            <ion-img *ngIf="articulo.urlToImage" [src]="articulo.urlToImage" />
-
-            <ion-card-subtitle class="ion-margin">
-              <span class="text-primary">{{i+1}}. </span>
-              <span class="article-source-name">{{articulo.source.name}}</span>
-            </ion-card-subtitle>
-
-            <ion-card-title class="ion-padding-horizontal ion-margin-bottom">
-              {{articulo.title}}
-            </ion-card-title>
-
-          </ion-card-header>
-
-          <ion-card-content *ngIf="articulo.description">
-            <p>{{articulo.description}}</p>
-          </ion-card-content>
-
-        </ion-card>
-
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+  <!-- Basicamente a nuestro componente articles ,le pasamos al llamarlo el "arrayArticulos" que como en el 
+  componente tenemos la variable   @Input() arrayArticulosEnComponente: Article[] = []
+  se la asignamos pasándoselo como vemos en  <app-articles [arrayArticulosEnComponente]="arrayArticulos">
+    Vease que he puesto ese nombre largo de arrayArticulosEnComponente para distinguirlos ahora. Pero podría llamarse igual en todas partes
+    y quedar como [arrayArticulos]="arrayArticulos" obviamente renombrando en el ts de componentes -->
+  <app-articles [arrayArticulosEnComponente]="arrayArticulos"></app-articles>
 
   <ion-list>
 

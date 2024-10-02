@@ -9,6 +9,7 @@ import { NewsService } from 'src/app/services/news.service';
 //como hemos nombrado el archivo index.ts será el que tome por defecto si no establecemos nada mas
 import { Article, NewsResponse } from 'src/app/interfaces';
 import { NgFor, NgIf } from '@angular/common';
+import { ArticlesComponent } from "../../components/articles/articles.component";
 
 
 
@@ -18,7 +19,7 @@ import { NgFor, NgIf } from '@angular/common';
   styleUrls: ['tab1.page.scss'],
   standalone: true,
   imports: [IonImg, IonCol, IonRow, IonGrid, IonCardContent, IonCardHeader, IonCardTitle, NgIf, IonCardSubtitle, IonCard, IonItem, IonLabel,
-    IonList, IonHeader, IonToolbar, IonTitle, IonContent, ExploreContainerComponent, NgFor],
+    IonList, IonHeader, IonToolbar, IonTitle, IonContent, ExploreContainerComponent, NgFor, ArticlesComponent],
 })
 export class Tab1Page implements OnInit { // le decimos que implemente onInit para implementar y usar ngOnInit
 

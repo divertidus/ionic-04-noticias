@@ -1,0 +1,22 @@
+<ion-card>
+
+
+  <!-- Solo intentará mostrar la imagen si existe gracias al *ngIf -->
+  <ion-img *ngIf="articulo.urlToImage" [src]="articulo.urlToImage" />
+
+  <ion-card-subtitle class="ion-margin">
+    <span class="text-primary">{{indiceArticulo}}. </span>
+    <span class="article-source-name">{{articulo.source.name}}</span>
+  </ion-card-subtitle>
+
+  <ion-card-title class="ion-padding-horizontal ion-margin-bottom">
+    {{articulo.title}}
+  </ion-card-title>
+
+
+
+  <ion-card-content *ngIf="articulo.description">
+    <p>{{articulo.description}}</p>
+  </ion-card-content>
+
+</ion-card>
