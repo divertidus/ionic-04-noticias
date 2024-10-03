@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'; // Importamos HttpClient para hacer peticiones HTTP
 import { Injectable } from '@angular/core'; // Decorador para servicios inyectables
 import { environment } from 'src/environments/environment'; // Importamos variables de entorno
-import { Observable } from 'rxjs'; // Para trabajar con flujos de datos asíncronos
+import { Observable, of } from 'rxjs'; // Para trabajar con flujos de datos asíncronos
 import { Article, ArticulosPorCategoriaYPagina, NewsResponse } from '../interfaces'; // Importamos interfaces personalizadas
 import { map } from 'rxjs/operators'; // Operador para transformar datos en un Observable
 
@@ -37,7 +37,7 @@ export class NewsService {
   // Constructor del servicio, inyectamos HttpClient
   constructor(private http: HttpClient) { }
 
-  // Método para obtener los titulares principales
+  // Método para obtener los titulares principales, sin categoria
   getTopHeadLines(): Observable<Article[]> {
     console.log("Peticion http realizada sin categoria que llamo al ExecuteQuery")
     return this.executeQuery<NewsResponse>(`/top-headlines?`).pipe(
@@ -46,7 +46,51 @@ export class NewsService {
   }
 
   // Método para obtener titulares por categoría
+  // Aqui debemos pensar lo siguiente:
+  // Si estamos a una categoria por "primera vez" o necesitamos más datos, debemos cargarlos desde la api
+  // Pero si solo estamos cambiando de categoría entre las que ya estaban cargadas, no. Ahi debo cargar lo que está en memoria.
+  //Por eso antes añadimos el cargarMas boolean, vamos a usarlo.
   getTopHeadLinesByCategory(category: string, cargarMas: boolean = false): Observable<Article[]> {
+
+    // SI QUIERE CARGAR MÁS ARTICULOS:
+    if (cargarMas) {
+      // llamamos al nuevo metodo que estuvimoshaciendo más abajo pasándole la categoría.
+      // podría hacer un  -- return this.getArticulosPorCategoria(category) --
+      // pero ese método me devuelve solo los de la página que sea y lo que queremos es todos 
+      /*      PARA EJEMPLIFICARLO ESTE ES EL BLOQUE FINAL DEL METODO DE ABAJO ANTES DE CAMBIARLO
+      if (articles.length === 0) return [];
+          this.articulosPorCategoriaYPagina[category] = { 
+            pagina: page,           
+  ESTOS SON LOS QUE QUIERO--->  articulos: [...this.articulosPorCategoriaYPagina[category].articulos, ...articles]
+  YA QUE INCLUYEN LOS ANTERIORES Y LOS NUEVOS
+
+          }
+          return articles; -> LO QUE DEVUELVE SON LOS ARTICULOS DE LA PAGINA QUE CORRESPONDA
+
+          if (articles.length === 0) return [];
+          this.articulosPorCategoriaYPagina[category] = { 
+            pagina: page,          
+            articulos: [...this.articulosPorCategoriaYPagina[category].articulos, ...articles]
+
+          }
+          return this.articulosPorCategoriaYPagina[category].articulos; -->Devuelvo esto otro y listo
+      */
+      return this.getArticulosPorCategoria(category) // tras los cambios ya podemos hacer aqui el return
+    }
+    // SI NO QUIERE CARGAR MÁS ARTICULOS puedes ser que no existan o que quiere cargar los que están en memoria
+    // Primero comprobemos si hay en memoria comprobando si lo siguiente existe.
+    // y si existe devolvemos sus articulos. Pero se espera un Observable, hay que arreglarlo.
+    // Aunque habría más opciones, darían problemas ya que en nuetro codigo usamos los observables y sus metodos
+    // Entonces usaremos una funciona de rxjs llamada "of". La importamos import { Observable,of } from 'rxjs'; /
+
+    if (this.articulosPorCategoriaYPagina[category]) {
+      //  return this.articulosPorCategoriaYPagina[category].articulos; // ->Error por no ser observable.
+      return of(this.articulosPorCategoriaYPagina[category].articulos);
+    } //  -> Arreglado
+
+    // Y SI NO EXISTE UNA CATEGORIA AHI HAREMOS LA MISMA FUNCION QUE SI QUISIESE CARGAR MAS Y ALLI COMPROBARA
+    return this.getArticulosPorCategoria(category)
+
     console.log("Peticion http realizada por categoria que llamó al executeQuery")
     return this.executeQuery<NewsResponse>(`/top-headlines?category=${category}`).pipe(
       map(({ articles }) => articles) // Extraemos solo el array de artículos de la respuesta
@@ -62,18 +106,41 @@ export class NewsService {
     } else {
       // Si no existe, la crea con valores iniciales
       this.articulosPorCategoriaYPagina[category] = {
-        page: 0,
+        pagina: 0,
         articulos: []
       }
     }
 
     // Incrementamos el número de página para la siguiente petición
-    const page = this.articulosPorCategoriaYPagina[category].page + 1;
+    const page = this.articulosPorCategoriaYPagina[category].pagina + 1;
+
+    // v0.14 -> Modificamos como devuelve el map ANTES:  map(({ articles }) => articles) 
 
     // Realizamos la petición HTTP para la categoría y página específicas
-    return this.executeQuery<NewsResponse>(`top-headlines?country=us&category=${category}&page=${page}`)
+
+
+    return this.executeQuery<NewsResponse>(`/top-headlines?country=us&category=${category}&page=${page}`)
       .pipe(
-        map(({ articles }) => articles) // Extraemos solo el array de artículos de la respuesta
+        map(({ articles }) => {  // Para este punto sabemos cual es la pagina, la categoria y tenemos los artículos
+          // Lo que tenemos que hacer es actualizar el objeto articulosPorCategoriaYPagina
+
+          //if (articles.length === 0) return []; --> Si no hay más que traer no quiero devolver vacio 
+          // --> Si no hay mas quiero lo que ya había y eso lo hago como abajo, con this.articulosPorCategoriaYPagina[category].articulos;
+          if (articles.length === 0) this.articulosPorCategoriaYPagina[category].articulos;
+          this.articulosPorCategoriaYPagina[category] = { // esto, basado en la categoria será igual al objeto
+            pagina: page,   // cuya pagina será page
+            //y cuyos articulos serán los de articles que estoy colocando aqui.
+            //Sin embargo queremos manter los anteriores... y si llegamos a la ultima pagina 
+            // llegará un array vacio. Entonces previamente ( mas arriba ) haremos 
+            //  if(articles.length === 0) return []; Si no hay articulos devuelve array vacio
+            // articulos: articles // pero con esto no añadiria 
+            // para ello hacemos  lo siguiente, ... es desestructurar el array. Cojo lo que tengo y le añado los articles.
+            articulos: [...this.articulosPorCategoriaYPagina[category].articulos, ...articles]
+
+          }
+          //return articles; //Con esto solo devuelvo los de lapagina que sea
+          return this.articulosPorCategoriaYPagina[category].articulos; // Con esto devuelvo los de la pagina + anteriores
+        })
       );
   }
 }

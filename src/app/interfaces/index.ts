@@ -46,7 +46,7 @@ Ls pongo entre corchetes tal que
 */
 export interface ArticulosPorCategoriaYPagina {
     [key: string]: {
-        page: number;
+        pagina: number;
         articulos: Article[]
     }
 }
