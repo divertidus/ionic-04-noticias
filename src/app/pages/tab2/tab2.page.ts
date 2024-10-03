@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonSegment, IonSegmentButton, IonLabel, SegmentChangeEventDetail, IonList, IonItem } from '@ionic/angular/standalone';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonSegment, IonSegmentButton, IonLabel, SegmentChangeEventDetail, IonList, IonItem, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/angular/standalone';
 import { ExploreContainerComponent } from '../../explore-container/explore-container.component';
 import { IonSegmentCustomEvent } from '@ionic/core';
 import { NgFor } from '@angular/common';
 import { ArticlesComponent } from "../../components/articles/articles.component";
 import { Article } from 'src/app/interfaces';
 import { NewsService } from 'src/app/services/news.service';
+import { InfiniteScrollCustomEvent } from '@ionic/angular';
+
 
 
 @Component({
@@ -13,10 +15,11 @@ import { NewsService } from 'src/app/services/news.service';
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss'],
   standalone: true,
-  imports: [IonItem, IonList, IonLabel, NgFor,
+  imports: [IonInfiniteScrollContent, IonInfiniteScroll, IonItem, IonList, IonLabel, NgFor,
     IonSegmentButton, IonSegment, IonHeader, IonToolbar, IonTitle, IonContent, ExploreContainerComponent, ArticlesComponent]
 })
 export class Tab2Page implements OnInit {
+
 
 
   constructor(private newsService: NewsService) { }
@@ -85,5 +88,28 @@ export class Tab2Page implements OnInit {
         console.log(articlesRecibidos);
       });
   }
+
+
+  @ViewChild(IonInfiniteScroll) infiniteScroll!: IonInfiniteScroll;
+  @ViewChild(IonSegment) segment!: IonSegment;
+
+
+  onIonInfinite(event: CustomEvent) {
+    this.segmentChanged(event);
+    console.log("ahora cargo, tras terminas el contador")
+    setTimeout(() => {
+      (event as InfiniteScrollCustomEvent).target.complete();
+    }, 5000);
+  }
+
+  cargarMasDatos() {
+    this.segmentChanged(event);
+    console.log("ahora cargo, tras terminas el contador")
+    setTimeout(() => {
+      (event as InfiniteScrollCustomEvent).target.complete();
+    }, 5000);
+  }
+}
+
 }
 

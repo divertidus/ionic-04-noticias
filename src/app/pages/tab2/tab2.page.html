@@ -22,6 +22,8 @@
 
   <app-articles [arrayArticulosEnComponente]="arrayArticulosPorCategoria"></app-articles>
 
-
+  <ion-infinite-scroll (ionInfinite)="cargarMasDatos()">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 
 </ion-content>
