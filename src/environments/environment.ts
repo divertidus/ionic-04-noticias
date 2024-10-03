@@ -4,8 +4,11 @@
 
 export const environment = {
   production: false,
-  apiKey: 'cc7732fd79cb4b4fb5ed75878b682efa' //Optimicemos el codigo guardando aqui la api en vez de en todo el codigo
+  apiKey: 'cc7732fd79cb4b4fb5ed75878b682efa', //Optimicemos el codigo guardando aqui la api en vez de en todo el codigo
+  apiURL: 'https://newsapi.org/v2' // v13 - Importo y creo esto con el inicio de la URL
 };
+
+
 
 /*
  * For easier debugging in development mode, you can import the following file

@@ -48,17 +48,21 @@ export class Tab2Page implements OnInit {
 
 
   private cargarArticulos() {
+    /* Esto de
+         this.arrayArticulosPorCategoria = [...this.arrayArticulosPorCategoria, ...articlesRecibidos]
+         viene a ser equivalente a la linea comentada debajo. 
+          Le dijo que el array será igual a lo que hay en el array y 
+          luego añado los articulos del array de articlesRecibidos.
+          Lo que viene haciendo tambien el push pero por verlo de otra forma. 
+         Como hacemos  = [cosas dentro]
+         dentro de los corchetes no meto los arrays, sino su contenido, por eso hago primero ... de modo que
+         "desarma" los array usando solo su contenido.
+         */
+    // this.newsService.getTopHeadLinesByCategory(this.categoriaSeleccionada)
     this.newsService.getTopHeadLinesByCategory(this.categoriaSeleccionada)
+
       .subscribe(articlesRecibidos => {
 
-        /* Esto viene a ser equivalente a la linea comentada debajo. 
-         Le dijo que el array será igual a lo que hay en el array y 
-         luego añado los articulos del array de articlesRecibidos.
-         Lo que viene haciendo tambien el push pero por verlo de otra forma. 
-        Como hacemos  = [cosas dentro]
-        dentro de los corchetes no meto los arrays, sino su contenido, por eso hago primero ... de modo que
-        "desarma" los array usando solo su contenido.
-        */
         this.arrayArticulosPorCategoria = [...this.arrayArticulosPorCategoria, ...articlesRecibidos]
 
         /*

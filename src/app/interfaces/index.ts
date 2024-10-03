@@ -23,6 +23,30 @@ export interface Source {
 }
 
 /*
-Ahora que tenemos una interfaz podemos importarla en nuestra tab1 y usarla alli diciendo que la respuesta es de tiepo NewsResponse
+Ahora que tenemos una interfaz podemos importarla 
+en nuestra tab1 y usarla alli diciendo que la respuesta es de tiepo NewsResponse
+*/
 
-*/ 
+/* Interfaz para no realizar tantas consutas http, esto va ligado a v13, en concreto para:
+
+private articlesByCategory = {
+    business: {
+      page: 0,
+      articles: []
+    }
+  }
+
+  que cambiará a:
+
+   private articlesByCategory: ArticulosPorCategoriaYPagina = { }
+
+
+La propiedad debe ser dinámica, como hacer eso?
+Ls pongo entre corchetes tal que
+*/
+export interface ArticulosPorCategoriaYPagina {
+    [key: string]: {
+        page: number;
+        articulos: Article[]
+    }
+}
