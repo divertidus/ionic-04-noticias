@@ -75,7 +75,7 @@ export class NewsService {
     // Importante que borremos la parte de &apiKey de la URL porque ya va a ir como parametro.
     // En la ayuda de ese get podemos ver que devuelve un generico (esta entre <>) asi que le podemos especificar el tipado como NewsResponse
 
-    return this.http.get<NewsResponse>(`https://newsapi.org/v2/everything?q=tesla&from=2024-09-02&sortBy=publishedAt`, {
+    return this.http.get<NewsResponse>(`https://newsapi.org/v2/top-headlines?country=us&category=business`, {
       params: { apiKey: apiKey }
     }).pipe(
       // map(respuesta => respuesta.articles)
@@ -96,6 +96,16 @@ export class NewsService {
 
         simplemente porque quede mas corto y saber que se hace, más claro. 
         */
+  }
+
+  getTopHeadLinesByCategory(category: string): Observable<Article[]> {
+
+    return this.http.get<NewsResponse>(`https://newsapi.org/v2/top-headlines?country=us&category=${category}`, {
+      params: { apiKey: apiKey, }
+    }).pipe(
+      // map(respuesta => respuesta.articles)
+      map(({ articles }) => articles)
+    );
   }
 }
 
