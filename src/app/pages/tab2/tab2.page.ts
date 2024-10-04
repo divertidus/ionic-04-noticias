@@ -35,12 +35,17 @@ export class Tab2Page implements OnInit {
   }
 
 
-  segmentChanged(evento: CustomEvent) {
-    this.categoriaSeleccionada = evento.detail.value;
+  segmentChanged(evento: Event) {
+    this.categoriaSeleccionada = (evento as CustomEvent).detail.value;
+    // o si arriba tenemos evento:CustomEvent aqui podemos hacer solo evento.detail.value
     // De este modo decimos que la categoriaSeleccionada siempre sea en la que se ha hecho click,
     // esto nos viene bien para poder hacer cosas con esa información, no para que se vea
     // visualmente marcada ya que eso lo hace el segment solito.
-    console.log(evento.detail.value)
+    console.log((evento as CustomEvent).detail.value)
+
+
+
+    // o si arriba tenemos evento:CustomEvent aqui podemos hacer solo evento.detail.value
 
     // Sin esto no se recarga el array porque se muestra el array ya con datos previos y se añaden los nuegos digamos
     this.arrayArticulosPorCategoria = []
@@ -94,22 +99,26 @@ export class Tab2Page implements OnInit {
   @ViewChild(IonSegment) segment!: IonSegment;
 
 
-  onIonInfinite(event: CustomEvent) {
-    this.segmentChanged(event);
-    console.log("ahora cargo, tras terminas el contador")
-    setTimeout(() => {
-      (event as InfiniteScrollCustomEvent).target.complete();
-    }, 5000);
-  }
 
-  cargarMasDatos() {
-    this.segmentChanged(event);
-    console.log("ahora cargo, tras terminas el contador")
-    setTimeout(() => {
-      (event as InfiniteScrollCustomEvent).target.complete();
-    }, 5000);
+  cargarMasDatos(event: any) {
+    console.log(event)
+    this.newsService.getTopHeadLinesByCategory(this.categoriaSeleccionada, true)
+      .subscribe(articulos => {
+
+        if (articulos.length === this.arrayArticulosPorCategoria.length) {
+          console.log("El ultimo articulo recibido y el guardado son el mismo. No hay mas")
+          event.target.disabled = true;
+          return;
+        }
+        event.target.disabled = false;
+        this.arrayArticulosPorCategoria = articulos;
+        setTimeout(() => {
+          event.target.complete();
+        }, 1000);
+      });
+    console.log("ahora cargo, tras terminas el timeout")
+
   }
 }
 
-}
 

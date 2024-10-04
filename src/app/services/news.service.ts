@@ -126,7 +126,10 @@ export class NewsService {
 
           //if (articles.length === 0) return []; --> Si no hay más que traer no quiero devolver vacio 
           // --> Si no hay mas quiero lo que ya había y eso lo hago como abajo, con this.articulosPorCategoriaYPagina[category].articulos;
-          if (articles.length === 0) this.articulosPorCategoriaYPagina[category].articulos;
+          if (articles.length === 0) {
+            console.log("No hay más que mostrar")
+            return this.articulosPorCategoriaYPagina[category].articulos;            
+          }
           this.articulosPorCategoriaYPagina[category] = { // esto, basado en la categoria será igual al objeto
             pagina: page,   // cuya pagina será page
             //y cuyos articulos serán los de articles que estoy colocando aqui.
@@ -137,8 +140,11 @@ export class NewsService {
             // para ello hacemos  lo siguiente, ... es desestructurar el array. Cojo lo que tengo y le añado los articles.
             articulos: [...this.articulosPorCategoriaYPagina[category].articulos, ...articles]
 
+
+
           }
-          //return articles; //Con esto solo devuelvo los de lapagina que sea
+          //return articles; //Con esto solo devuelvo los de la pagina que sea
+
           return this.articulosPorCategoriaYPagina[category].articulos; // Con esto devuelvo los de la pagina + anteriores
         })
       );
