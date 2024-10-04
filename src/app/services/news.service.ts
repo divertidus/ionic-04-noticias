@@ -37,13 +37,22 @@ export class NewsService {
   // Constructor del servicio, inyectamos HttpClient
   constructor(private http: HttpClient) { }
 
-  // Método para obtener los titulares principales, sin categoria
+  // Método para obtener los titulares principales, que sera de business siempre
   getTopHeadLines(): Observable<Article[]> {
     console.log("Peticion http realizada sin categoria que llamo al ExecuteQuery")
-    return this.executeQuery<NewsResponse>(`/top-headlines?`).pipe(
+    return this.executeQuery<NewsResponse>(`/top-headlines?category=business`).pipe(
       map(({ articles }) => articles) // Extraemos solo el array de artículos de la respuesta
     );
   }
+  /*
+    // Método para obtener los titulares principales, sin categoria
+    getTopHeadLines(): Observable<Article[]> {
+      console.log("Peticion http realizada sin categoria que llamo al ExecuteQuery")
+      return this.executeQuery<NewsResponse>(`/top-headlines?`).pipe(
+        map(({ articles }) => articles) // Extraemos solo el array de artículos de la respuesta
+      );
+    }
+  */
 
   // Método para obtener titulares por categoría
   // Aqui debemos pensar lo siguiente:
@@ -77,11 +86,12 @@ export class NewsService {
       */
       return this.getArticulosPorCategoria(category) // tras los cambios ya podemos hacer aqui el return
     }
-    // SI NO QUIERE CARGAR MÁS ARTICULOS puedes ser que no existan o que quiere cargar los que están en memoria
-    // Primero comprobemos si hay en memoria comprobando si lo siguiente existe.
-    // y si existe devolvemos sus articulos. Pero se espera un Observable, hay que arreglarlo.
-    // Aunque habría más opciones, darían problemas ya que en nuetro codigo usamos los observables y sus metodos
-    // Entonces usaremos una funciona de rxjs llamada "of". La importamos import { Observable,of } from 'rxjs'; /
+
+    /* SI NO QUIERE CARGAR MÁS ARTICULOS puedes ser que no existan o que quiere cargar los que están en memoria
+     Primero comprobemos si hay en memoria comprobando si lo siguiente existe.
+     y si existe devolvemos sus articulos. Pero se espera un Observable, hay que arreglarlo.
+     Aunque habría más opciones, darían problemas ya que en nuetro codigo usamos los observables y sus metodos
+     Entonces usaremos una funciona de rxjs llamada "of". La importamos import { Observable,of } from 'rxjs'; */
 
     if (this.articulosPorCategoriaYPagina[category]) {
       //  return this.articulosPorCategoriaYPagina[category].articulos; // ->Error por no ser observable.
@@ -89,6 +99,7 @@ export class NewsService {
     } //  -> Arreglado
 
     // Y SI NO EXISTE UNA CATEGORIA AHI HAREMOS LA MISMA FUNCION QUE SI QUISIESE CARGAR MAS Y ALLI COMPROBARA
+    console.log("Peticion http realizada por categoria que llamó al executeQuery")
     return this.getArticulosPorCategoria(category)
 
     console.log("Peticion http realizada por categoria que llamó al executeQuery")
@@ -128,7 +139,7 @@ export class NewsService {
           // --> Si no hay mas quiero lo que ya había y eso lo hago como abajo, con this.articulosPorCategoriaYPagina[category].articulos;
           if (articles.length === 0) {
             console.log("No hay más que mostrar")
-            return this.articulosPorCategoriaYPagina[category].articulos;            
+            return this.articulosPorCategoriaYPagina[category].articulos;
           }
           this.articulosPorCategoriaYPagina[category] = { // esto, basado en la categoria será igual al objeto
             pagina: page,   // cuya pagina será page

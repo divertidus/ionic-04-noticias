@@ -22,7 +22,7 @@
 
   <app-articles [arrayArticulosEnComponente]="arrayArticulosPorCategoria"></app-articles>
 
-  <ion-infinite-scroll (ionInfinite)="cargarMasDatos($event)">
+  <ion-infinite-scroll #infiniteComponente (ionInfinite)="cargarMasDatos()">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>
   </ion-infinite-scroll>
 

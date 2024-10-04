@@ -30,12 +30,17 @@ export class Tab2Page implements OnInit {
 
   public arrayArticulosPorCategoria: Article[] = []
 
+  private puedeCargarDatos: boolean = true;
+
   ngOnInit(): void {
     this.cargarArticulos();
   }
 
 
   segmentChanged(evento: Event) {
+    this.puedeCargarDatos = true;
+    //this.infiniteScroll.disabled = false
+    console.log(this.infiniteScroll.disabled)
     this.categoriaSeleccionada = (evento as CustomEvent).detail.value;
     // o si arriba tenemos evento:CustomEvent aqui podemos hacer solo evento.detail.value
     // De este modo decimos que la categoriaSeleccionada siempre sea en la que se ha hecho click,
@@ -94,30 +99,50 @@ export class Tab2Page implements OnInit {
       });
   }
 
-
+  //Le digo a @ViewChild que busque en el templatehtml un componente llamado IonInfiniteScroll
+  // al que voy a llamar infiniteScroll  y será de tipo IonInfiniteScroll
   @ViewChild(IonInfiniteScroll) infiniteScroll!: IonInfiniteScroll;
-  @ViewChild(IonSegment) segment!: IonSegment;
+  /*
+  Como dato. Si quisiese usar este infniteScroll en el ngOnInit por ejemplo, es decir, antes de realmente haber 
+  bajado hasta que el componente se use, tendría error.
+  De hecho si implemento el onInit y dentro le ponngo console.log(infiniteScroll) veré un undefined en la consola.
+  Para arreglar eso tendría que añadie en el viewchild { static : true} de modo que quedaría.
+  
+  @ViewChild(IonInfiniteScroll, { static : true }) infiniteScroll!: IonInfiniteScroll;
+
+  Diciendole eso le digo que este disponible desde el principio.
+  */
+
+  @ViewChild('infiniteComponente') segment!: IonSegment;
 
 
+  /* Remuevo los eventos y donde antes habia un event.target lo reemplazo por this.infiniteScroll*/
+  /* Quito el setTimeout por ver mejor el codigo nada mas*/
+  cargarMasDatos() {
 
-  cargarMasDatos(event: any) {
-    console.log(event)
+    console.log('entro al cargarMasDatos!');
+
+    if (!this.puedeCargarDatos) {
+      console.log("no se pueden cargar mas datos dice el token de control")
+      this.infiniteScroll.complete();
+      return;
+    }
     this.newsService.getTopHeadLinesByCategory(this.categoriaSeleccionada, true)
       .subscribe(articulos => {
-
         if (articulos.length === this.arrayArticulosPorCategoria.length) {
-          console.log("El ultimo articulo recibido y el guardado son el mismo. No hay mas")
-          event.target.disabled = true;
+          console.log("El ultimo articulo recibido y el guardado son el mismo. No hay mas");
+          console.log('Dentro del if de que no hay mas datos en el cargarMasDatos, antes deshabilitarlo');
+          this.puedeCargarDatos = false;
+          // this.infiniteScroll.disabled = true
+          this.infiniteScroll.complete();
           return;
         }
-        event.target.disabled = false;
-        this.arrayArticulosPorCategoria = articulos;
-        setTimeout(() => {
-          event.target.complete();
-        }, 1000);
-      });
-    console.log("ahora cargo, tras terminas el timeout")
 
+        console.log('en el cargar datos pero sin entrar en el if antes del complete...');
+        this.infiniteScroll.complete();
+        this.arrayArticulosPorCategoria = articulos;
+      });
+    console.log("ahora cargo, tras terminar el timeout");
   }
 }
 
