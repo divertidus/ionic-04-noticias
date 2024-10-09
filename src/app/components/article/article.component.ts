@@ -13,6 +13,7 @@ import { Icon } from 'ionicons/dist/types/components/icon/icon';
 import { Share } from '@capacitor/share';
 import { Capacitor } from '@capacitor/core'; // Importa Capacitor
 import { StorageService } from 'src/app/services/storage.service';
+import { ActionSheetController } from '@ionic/angular'; //Esto para poder manejar mejor el actionSheet
 
 
 @Component({
@@ -31,7 +32,11 @@ export class ArticleComponent implements OnInit {
   @Input() articulo!: Article;
   @Input() indiceArticulo: number = 0;
 
-  constructor(private storageService: StorageService) {
+
+  constructor(
+    private storageService: StorageService,
+    private actionSheetCtrl: ActionSheetController
+  ) {
     addIcons(ionIcons);
   }
 
@@ -42,9 +47,9 @@ export class ArticleComponent implements OnInit {
   Asi no sucede el problema de que en una pagina funciona el action sheet pero en otra página no funcionan aquellos que ya 
   se habian cargado previamente desde la primera. Asi todo perfecto.
   */
-  presentActionSheet() {  //SOLUCION MAS COMODA
+  /*presentActionSheet() {  //SOLUCION MAS COMODA
     this.actionSheet.present();
-  }
+  }*/
 
   mostrarIndice() {
     console.log(this.indiceArticulo)
@@ -102,27 +107,70 @@ export class ArticleComponent implements OnInit {
 
   */
 
-  public actionSheetButtons = [ // En caso de que corra en  dispositivo con capacitor
-    {
-      text: "Compartir",
-      icon: "share-outline",
-      data: {},
-      handler: () => this.accionHandler('compartir')
-    },
-    {
-      text: "Favorito",
-      icon: "heart-outline",
-      data: {},
-      handler: () => this.accionHandler('favorito')
-    },
-    {
-      text: "Cancelar",
-      icon: "close-outline",
-      role: "cancel",
-      data: {},
-      handler: () => this.accionHandler('cancelar')
-    }
-  ];
+  /*Dado que voy a usar otra forma de implementar los botones comentaré esto. Usaré un método para que los mismos se generen al hacer click
+  y abrir el menu de botones, no que precargue todos antes. Supong que mejora el rendimiento, pero así puedo tener más control
+  para variar el boton si esta o no en favorito un articulo ya que podré crear una propiedad para comprobarlo al ir a darle y no antes.
+  */
+
+  /*
+    public actionSheetButtons = [ // En caso de que corra en  dispositivo con capacitor
+      {
+        text: "Compartir",
+        icon: "share-outline",
+        data: {},
+        handler: () => this.accionHandler('compartir')
+      },
+      {
+        text: this.storageService.articuloEnFavoritos(this.articulo) ? "Quitar de favoritos" : "Favorito",  // Cambia el texto basado en si está o no en favoritos
+        icon: this.storageService.articuloEnFavoritos(this.articulo) ? "heart" : "heart-outline",  // Cambia el icono basado en si está o no en favoritos
+        data: {},
+        handler: () => this.accionHandler('favorito')
+      },
+      {
+        text: "Cancelar",
+        icon: "close-outline",
+        role: "cancel",
+        data: {},
+        handler: () => this.accionHandler('cancelar')
+      }
+    ];
+    */
+  backdropVisible = false;
+  async abrirMenuOpcionesActionSheet() {
+
+    const esFavorito = this.storageService.articuloEnFavoritos(this.articulo)
+    this.backdropVisible = true;
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Acciones',
+
+      buttons: [ // En caso de que corra en  dispositivo con capacitor
+        {
+          text: "Compartir",
+          icon: "share-outline",
+          data: {},
+          handler: () => this.accionHandler('compartir')
+        },
+        {
+          text: esFavorito ? "Quitar de favoritos" : "Favorito",  // Cambia el texto basado en si está o no en favoritos
+          icon: esFavorito ? "heart" : "heart-outline",  // Cambia el icono basado en si está o no en favoritos
+          data: {},
+          handler: () => this.accionHandler('favorito')
+        },
+        {
+
+          text: "Cancelar",
+          icon: "close-outline",
+          role: "cancel",
+          data: {},
+          handler: () => this.accionHandler('cancelar'),
+        }
+      ]
+
+    });
+    await actionSheet.present();
+
+  }
+
 
 
   /*OTRA OPCION PARA NO DUPLICAR EL CODIGO DE LOS BOTONES SERÍA HACERLE UN PUSH AL ARRAY DE BOTONES, DEJO EJEMPLO DEBAJO:
@@ -178,8 +226,8 @@ export class ArticleComponent implements OnInit {
         break;
 
       case "favorito":
-        console.log("Se pulsa favorito");   
-        this.onToogleFavorite();   
+        console.log("Se pulsa favorito/quitar de favorito");
+        this.onToogleFavorite();
         break;
 
       case "cancelar":
@@ -191,12 +239,10 @@ export class ArticleComponent implements OnInit {
 
   async compartirNoticia() {
 
-
     // Share url only
     /*await Share.share({
       url: this.articulo.url,
     });*/
-
 
     await Share.share({
       title: 'See cool stuff',

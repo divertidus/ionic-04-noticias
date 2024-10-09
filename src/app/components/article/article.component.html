@@ -20,11 +20,14 @@
         <!--  [id]="'abrir-action-sheet'+ indiceArticulo" -->
         <!-- Mejor la opcion de llamar a un metodo para mostrar el action Sheet -->
         <!-- Ahorra todos los problema que tenía -->
-        <ion-button fill="clear" shape="round" (click)="mostrarIndice()" (click)="presentActionSheet()">
+        <ion-button fill="clear" shape="round" (click)="mostrarIndice()" (click)="abrirMenuOpcionesActionSheet()">
           <ion-icon slot="start" name="ellipsis-vertical"></ion-icon>
         </ion-button>
         <!-- [trigger]="'abrir-action-sheet'+ indiceArticulo" -->
-        <ion-action-sheet class="my-custom-class" [buttons]="actionSheetButtons"></ion-action-sheet>
+
+        <!-- ESTO ANTES, CON LOS BOTONES EN VEZ DE ACCION -->
+        <!--  <ion-action-sheet class="my-custom-class" [buttons]="actionSheetButtons" -->
+        <!-- <ion-action-sheet class="my-custom-class"></ion-action-sheet> -->
 
 
       </ion-col>
