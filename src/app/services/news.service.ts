@@ -5,6 +5,7 @@ import { Observable, of } from 'rxjs'; // Para trabajar con flujos de datos así
 import { Article, ArticulosPorCategoriaYPagina, NewsResponse } from '../interfaces'; // Importamos interfaces personalizadas
 import { map } from 'rxjs/operators'; // Operador para transformar datos en un Observable
 
+
 // Extraemos apiKey y apiUrl de las variables de entorno
 const apiKey = environment.apiKey;
 const apiUrl = environment.apiURL;
@@ -16,6 +17,9 @@ Sino que iremos cogiendo el valor del archivo environment donde la hemos definid
   providedIn: 'root' // Esto hace que el servicio esté disponible en toda la aplicación
 })
 export class NewsService {
+  
+  // Constructor del servicio, inyectamos HttpClient
+  constructor(private http: HttpClient) { }
 
   /* Método genérico para ejecutar consultas HTTP
      T es un tipo genérico que se especificará cuando se llame al método
@@ -34,8 +38,7 @@ export class NewsService {
      Esto evita hacer peticiones HTTP repetidas para información ya obtenida */
   private articulosPorCategoriaYPagina: ArticulosPorCategoriaYPagina = {}
 
-  // Constructor del servicio, inyectamos HttpClient
-  constructor(private http: HttpClient) { }
+  
 
   // Método para obtener los titulares principales, que sera de business siempre
   getTopHeadLines(): Observable<Article[]> {

@@ -12,6 +12,7 @@ import { Article } from 'src/app/interfaces';
 import { Icon } from 'ionicons/dist/types/components/icon/icon';
 import { Share } from '@capacitor/share';
 import { Capacitor } from '@capacitor/core'; // Importa Capacitor
+import { StorageService } from 'src/app/services/storage.service';
 
 
 @Component({
@@ -19,12 +20,22 @@ import { Capacitor } from '@capacitor/core'; // Importa Capacitor
   templateUrl: './article.component.html',
   styleUrls: ['./article.component.scss'],
   standalone: true,
-  imports: [IonActionSheet, IonIcon, IonButton, IonGrid, IonRow, IonCardSubtitle, IonCol, IonCard, IonCardTitle, IonImg, IonCardContent, NgFor, NgIf],
+  imports: [IonActionSheet, IonIcon, IonButton, IonGrid, IonRow,
+    IonCardSubtitle, IonCol, IonCard, IonCardTitle, IonImg, IonCardContent, NgFor, NgIf],
   providers: [Input]
 })
 export class ArticleComponent implements OnInit {
 
   @ViewChild(IonActionSheet) actionSheet!: IonActionSheet; //SOLUCION MAS COMODA
+
+  @Input() articulo!: Article;
+  @Input() indiceArticulo: number = 0;
+
+  constructor(private storageService: StorageService) {
+    addIcons(ionIcons);
+  }
+
+  ngOnInit() { }
 
   /*
   En vez del trigger, es más sencillo y da menos problemas usar el viewmodel y un medoto que presente el actionsheet.
@@ -40,11 +51,9 @@ export class ArticleComponent implements OnInit {
     console.log(this.articulo.title)
   }
 
-  @Input() articulo!: Article;
-  @Input() indiceArticulo: number = 0;
 
-  constructor() { addIcons(ionIcons); }
-  ngOnInit() { }
+
+
 
 
   /* Por si quiero restringir si compartir aparece o no puedo hacerlo así. De todos modos 
@@ -169,7 +178,8 @@ export class ArticleComponent implements OnInit {
         break;
 
       case "favorito":
-        console.log("Se pulsa favorito");
+        console.log("Se pulsa favorito");   
+        this.onToogleFavorite();   
         break;
 
       case "cancelar":
@@ -195,6 +205,10 @@ export class ArticleComponent implements OnInit {
       dialogTitle: 'Share with buddies',
     });
 
+  }
+
+  onToogleFavorite() {
+    this.storageService.saveRemoveArticle(this.articulo);
   }
 
 

@@ -4,18 +4,21 @@ import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalo
 import { provideHttpClient } from '@angular/common/http';
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
+import { IonicStorageModule } from '@ionic/storage-angular';
+import { importProvidersFrom } from '@angular/core';
+
+// Configuración de almacenamiento
+
 
 bootstrapApplication(AppComponent, {
   providers: [
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, //Configuración de RouteReuseStrategy
-    provideIonicAngular(), //Configuración de Ionic Angular
-    provideRouter(routes, withPreloading(PreloadAllModules)), //Configuración del router
-    provideHttpClient() // añado el Configuración de HttpClient. 
-    // Esto hace que HttpClient esté disponible para realizar solicitudes HTTP en toda la aplicación.
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, // Configuración de RouteReuseStrategy
+    provideIonicAngular(), // Configuración de Ionic Angular
+    provideRouter(routes, withPreloading(PreloadAllModules)), // Configuración del router
+    provideHttpClient(), // Configuración del HttpClient
+    importProvidersFrom(IonicStorageModule.forRoot()), // Configuración del almacenamiento local
   ],
-});
-
-
+}).catch((err) => console.error(err));
 /*
 Guía Esencial: Servicio API en Ionic 8 con Componentes Standalone
 Pasos 100% Necesarios
